@@ -1,9 +1,8 @@
 services:
-  
   # Service/Container 1 - Postgres DB
   postgres:
     # Latest version
-    image: postgres:latest
+    image: postgres:17
     # Dedicated volume for Postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -13,19 +12,19 @@ services:
       - "5432:5432"
     # Database configuration
     environment:
-    # Default database
+      # Default database
       - "POSTGRES_DB=postgres"
-    # Default user
+      # Default user
       - "POSTGRES_USER=postgres"
-    # Set password
-      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"  
+      # Set password
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     # Optional: add healthcheck
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   # Service/Container 2 - n8n
   n8n:
     # Latest version
@@ -34,16 +33,16 @@ services:
       - "5678:5678"
     environment:
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres  # Must match service name above
+      - DB_POSTGRESDB_HOST=postgres # Must match service name above
       - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=n8n  # n8n will create this database
+      - DB_POSTGRESDB_DATABASE=n8n # n8n will create this database
       - DB_POSTGRESDB_USER=postgres
-      - DB_POSTGRESDB_PASSWORD=postgres
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       # Optional: Set timezone
       - TZ=UTC
     depends_on:
-      postgres:  # Wait for postgres_db service
-        condition: service_healthy  # Wait until healthcheck passes
+      postgres: # Wait for postgres_db service
+        condition: service_healthy # Wait until healthcheck passes
     # Optional: persist n8n data
     volumes:
       - n8n_data:/home/node/.n8n
@@ -52,10 +51,3 @@ services:
 volumes:
   postgres_data:
   n8n_data:
-
-
-
-
- 
-
-
